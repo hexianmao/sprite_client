@@ -1,37 +1,26 @@
 package com.alibaba.sprite.audio;
 
-import java.io.DataOutputStream;
-import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 
-import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.util.Log;
 
 import com.alibaba.sprite.SpriteClient;
 
-public class Saudioclient extends Thread {
+public class SpriteRecorder extends Thread {
 
     protected SpriteClient client;
     protected boolean keepRunning;
     protected AudioRecord record;
-    protected int m_in_buf_size;
-    protected byte[] m_in_bytes;
-
-    protected Socket s;
-    protected DataOutputStream dout;
-    protected LinkedList<byte[]> m_in_q;
 
     public void init(SpriteClient client) {
         this.client = client;
         this.keepRunning = true;
         this.record = new AudioRecord(
-                MediaRecorder.AudioSource.MIC,
-                8000,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
+                SpriteClient.AUDIO_SOURCE,
+                SpriteClient.SAMPLE_RATE,
+                SpriteClient.CHANNEL_IN_CONFIG,
+                SpriteClient.AUDIO_FORMAT,
                 client.getBufferSize());
     }
 

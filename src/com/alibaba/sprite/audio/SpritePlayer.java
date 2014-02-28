@@ -3,14 +3,13 @@ package com.alibaba.sprite.audio;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
-import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
 
 import com.alibaba.sprite.SpriteClient;
 
-public class Saudioserver extends Thread {
+public class SpritePlayer extends Thread {
 
     protected SpriteClient client;
     protected boolean keepRunning;
@@ -21,9 +20,9 @@ public class Saudioserver extends Thread {
         this.keepRunning = true;
         this.track = new AudioTrack(
                 AudioManager.STREAM_MUSIC,
-                8000,
-                AudioFormat.CHANNEL_OUT_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
+                SpriteClient.SAMPLE_RATE,
+                SpriteClient.CHANNEL_OUT_CONFIG,
+                SpriteClient.AUDIO_FORMAT,
                 client.getBufferSize(),
                 AudioTrack.MODE_STREAM);
 
