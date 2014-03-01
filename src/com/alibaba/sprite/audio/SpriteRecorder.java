@@ -33,7 +33,7 @@ public class SpriteRecorder extends Thread {
                 bb = client.getBufferPool().allocate();
                 record.read(bb.array(), 0, bb.capacity());
                 //Log.d("##Record", "position:" + bb.position() + ",limit:" + bb.limit());
-                client.getBufferQueue().offer(bb);
+                client.getSendQueue().offer(bb);
                 bb = null;
             } catch (Exception e) {
                 if (bb != null) {

@@ -36,7 +36,7 @@ public class SpritePlayer extends Thread {
         ByteBuffer bb = null;
         while (keepRunning) {
             try {
-                if ((bb = client.getBufferQueue().poll(500, TimeUnit.MILLISECONDS)) != null) {
+                if ((bb = client.getSendQueue().poll(500, TimeUnit.MILLISECONDS)) != null) {
                     //Log.d("##Track", "position:" + bb.position() + ",limit:" + bb.limit());
                     track.write(bb.array(), 0, bb.capacity());
                 }

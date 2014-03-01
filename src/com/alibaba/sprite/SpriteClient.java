@@ -19,31 +19,33 @@ public class SpriteClient extends Application {
 
     public static final int TOTAL_BUFFER_SIZE = 1024 * 1024;
 
-    // ÒôÆµ»ñÈ¡Ô´ 
+    // éŸ³é¢‘è·å–æº 
     public static int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
 
-    // ÉèÖÃÒôÆµ²ÉÑùÂÊ£¬44100ÊÇÄ¿Ç°µÄ±ê×¼£¬µ«ÊÇÄ³Ğ©Éè±¸ÈÔÈ»Ö§³Ö22050£¬16000£¬11025  
+    // è®¾ç½®éŸ³é¢‘é‡‡æ ·ç‡ï¼Œ44100æ˜¯ç›®å‰çš„æ ‡å‡†ï¼Œä½†æ˜¯æŸäº›è®¾å¤‡ä»ç„¶æ”¯æŒ22050ï¼Œ16000ï¼Œ11025  
     public static int SAMPLE_RATE = 44100;
 
-    // ÉèÖÃÒôÆµµÄÂ¼ÖÆÉùµÀCHANNEL_IN_STEREOÎªË«ÉùµÀ£¬CHANNEL_CONFIGURATION_MONOÎªµ¥ÉùµÀ  
+    // è®¾ç½®éŸ³é¢‘çš„å½•åˆ¶å£°é“CHANNEL_IN_STEREOä¸ºåŒå£°é“ï¼ŒCHANNEL_CONFIGURATION_MONOä¸ºå•å£°é“  
     public static int CHANNEL_IN_CONFIG = AudioFormat.CHANNEL_IN_STEREO;
 
-    // ÉèÖÃÒôÆµµÄ²¥·ÅÉùµÀCHANNEL_OUT_STEREOÎªË«ÉùµÀ£¬CHANNEL_OUT_MONOÎªµ¥ÉùµÀ  
+    // è®¾ç½®éŸ³é¢‘çš„æ’­æ”¾å£°é“CHANNEL_OUT_STEREOä¸ºåŒå£°é“ï¼ŒCHANNEL_OUT_MONOä¸ºå•å£°é“  
     public static int CHANNEL_OUT_CONFIG = AudioFormat.CHANNEL_OUT_STEREO;
 
-    // ÒôÆµÊı¾İ¸ñÊ½:PCM 16Î»Ã¿¸öÑù±¾¡£±£Ö¤Éè±¸Ö§³Ö¡£PCM 8Î»Ã¿¸öÑù±¾¡£²»Ò»¶¨ÄÜµÃµ½Éè±¸Ö§³Ö¡£  
+    // éŸ³é¢‘æ•°æ®æ ¼å¼:PCM 16ä½æ¯ä¸ªæ ·æœ¬ã€‚ä¿è¯è®¾å¤‡æ”¯æŒã€‚PCM 8ä½æ¯ä¸ªæ ·æœ¬ã€‚ä¸ä¸€å®šèƒ½å¾—åˆ°è®¾å¤‡æ”¯æŒã€‚  
     public static int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
     private final int bufferSize;
     private final BufferPool bufferPool;
-    private final BlockingQueue<ByteBuffer> bufferQueue;
+    private final BlockingQueue<ByteBuffer> sendQueue;
+    private final BlockingQueue<ByteBuffer> recvQueue;
 
     public SpriteClient() {
         int s1 = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN_CONFIG, AUDIO_FORMAT);
         int s2 = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_OUT_CONFIG, AUDIO_FORMAT);
         this.bufferSize = s1 > s2 ? s1 : s2;
         this.bufferPool = new BufferPool(TOTAL_BUFFER_SIZE, bufferSize);
-        this.bufferQueue = new LinkedBlockingQueue<ByteBuffer>();
+        this.sendQueue = new LinkedBlockingQueue<ByteBuffer>();
+        this.recvQueue = new LinkedBlockingQueue<ByteBuffer>();
     }
 
     public int getBufferSize() {
@@ -54,12 +56,17 @@ public class SpriteClient extends Application {
         return bufferPool;
     }
 
-    public BlockingQueue<ByteBuffer> getBufferQueue() {
-        return bufferQueue;
+    public BlockingQueue<ByteBuffer> getSendQueue() {
+        return sendQueue;
+    }
+
+    public BlockingQueue<ByteBuffer> getRecvQueue() {
+        return recvQueue;
     }
 
     public void free() {
-        bufferQueue.clear();
+        sendQueue.clear();
+        recvQueue.clear();
     }
 
     @Override

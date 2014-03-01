@@ -67,6 +67,17 @@ public class Connection {
         }
     }
 
+    public void call(String uid) throws IOException {
+        AudioPacket packet = new AudioPacket();
+        packet.type = AudioPacket.COM_CALL;
+        packet.data = uid.getBytes();
+        send(packet);
+        packet = receive();
+        if (packet.type != AudioPacket.COM_OK) {
+            throw new RuntimeException("call error");
+        }
+    }
+
     public void send(AudioPacket packet) throws IOException {
         packet.write(out);
         out.flush();
@@ -104,21 +115,15 @@ public class Connection {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        final Connection con = new Connection();
-        con.connect("localhost", 8066);
-
-        AudioPacket packet = new AudioPacket();
-        packet.type = AudioPacket.COM_CALL;
-        packet.data = con.getUid().getBytes();
-        con.send(packet);
-
-        packet = con.receive();
-        if (packet.type == AudioPacket.COM_OK) {
-            new R(con).start();
-            new W(con).start();
-        } else {
-            con.close();
+    public static void main(String[] args) {
+        Connection c = new Connection();
+        try {
+            c.connect("localhost", 8066);
+            c.call(c.getUid());
+            new R(c).start();
+            new W(c).start();
+        } catch (IOException e) {
+            c.close();
         }
     }
 
@@ -133,8 +138,7 @@ public class Connection {
         public void run() {
             while (true) {
                 try {
-                    AudioPacket packet = c.receive();
-                    System.out.println(packet);
+                    c.receive();
                 } catch (IOException e) {
                     c.close();
                 }
@@ -144,7 +148,7 @@ public class Connection {
     }
 
     static class W extends Thread {
-        Connection c;
+        final Connection c;
 
         W(Connection c) {
             this.c = c;
